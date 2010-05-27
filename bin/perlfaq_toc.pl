@@ -50,7 +50,7 @@ into nine major sections outlined in this document.
 
 The perlfaq comes with the standard Perl distribution, so if you have Perl
 you should have the perlfaq. You should also have the C<perldoc> tool
-that let's you read the L<perlfaq>:
+that lets you read the L<perlfaq>:
 
 	$ perldoc perlfaq
 
@@ -111,7 +111,7 @@ and the perlfaq notes those contributions wherever appropriate.
 
 =head1 AUTHOR AND COPYRIGHT
 
-Tom Christainsen wrote the original version of this document.
+Tom Christiansen wrote the original version of this document.
 brian d foy C<< <bdfoy@cpan.org> >> wrote this version. See the
 individual perlfaq documents for additional copyright information.
 

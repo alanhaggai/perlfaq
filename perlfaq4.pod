@@ -11,6 +11,10 @@ numbers, dates, strings, arrays, hashes, and miscellaneous data issues.
 
 =head2 Why am I getting long decimals (eg, 19.9499999999999) instead of the numbers I should be getting (eg, 19.95)?
 
+For the long explanation, see David Goldberg's "What Every Computer
+Scientist Should Know About Floating-Point Arithmetic"
+(http://docs.sun.com/source/806-3568/ncg_goldberg.html).
+
 Internally, your computer represents floating-point numbers in binary.
 Digital (as in powers of two) computers cannot store all numbers
 exactly.  Some real numbers lose precision in the process.  This is a
@@ -62,7 +66,7 @@ are in base 10:
 	print $string + 44; # prints 688, certainly not octal!
 
 This problem usually involves one of the Perl built-ins that has the
-same name a unix command that uses octal numbers as arguments on the
+same name a Unix command that uses octal numbers as arguments on the
 command line. In this example, C<chmod> on the command line knows that
 its first argument is octal because that's what it does:
 
@@ -537,11 +541,11 @@ doesn't matter and you end up with the previous date.
 
 (contributed by brian d foy)
 
-Perl itself never had a Y2K problem, although that nevers stopped people
+Perl itself never had a Y2K problem, although that never stopped people
 from creating Y2K problems on their own. See the documentation for
 C<localtime> for its proper use.
 
-Starting with Perl 5.11, C<localtime> and C<gmtime> can handle dates past 
+Starting with Perl 5.11, C<localtime> and C<gmtime> can handle dates past
 03:14:08 January 19, 2038, when a 32-bit based time would overflow. You
 still might get a warning on a 32-bit C<perl>:
 
@@ -978,7 +982,7 @@ Left and right padding with any character, modifying C<$text> directly:
 
 (contributed by brian d foy)
 
-If you know where the columns that contain the data, you can
+If you know the columns that contain the data, you can
 use C<substr> to extract a single column.
 
 	my $column = substr( $line, $start_column, $length );
@@ -1213,7 +1217,7 @@ for list operations, so list operations also work on arrays:
 
 	my @three = grep { length == 3 } qw( dog cat bird );
 	my @three = grep { length == 3 } @animals;
-	
+
 	# supply an argument list
 	wash_animals( qw( dog cat bird ) );
 	wash_animals( @animals );
@@ -1236,15 +1240,15 @@ You can change an array element, but you can't change a list element:
 	foreach ( @animals ) {
 		s/^d/fr/;  # works fine
 		}
-	
+
 	foreach ( qw( dog cat bird ) ) {
 		s/^d/fr/;  # Error! Modification of read only value!
 		}
 
-However, if the list element is itself a variable, it appears that you 
+However, if the list element is itself a variable, it appears that you
 can change a list element. However, the list element is the variable, not
 the data. You're not changing the list element, but something the list
-element refers to. The list element itself doesn't change: it's still 
+element refers to. The list element itself doesn't change: it's still
 the same variable.
 
 You also have to be careful about context. You can assign an array to
@@ -1252,7 +1256,7 @@ a scalar to get the number of elements in the array. This only works
 for arrays, though:
 
 	my $count = @animals;  # only works with arrays
-	
+
 If you try to do the same thing with what you think is a list, you
 get a quite different result. Although it looks like you have a list
 on the righthand side, Perl actually sees a bunch of scalars separated
@@ -1272,22 +1276,40 @@ last element is also the count they expect:
 
 =head2 What is the difference between $array[1] and @array[1]?
 
-The former is a scalar value; the latter an array slice, making
-it a list with one (scalar) value.  You should use $ when you want a
-scalar value (most of the time) and @ when you want a list with one
-scalar value in it (very, very rarely; nearly never, in fact).
+(contributed by brian d foy)
 
-Sometimes it doesn't make a difference, but sometimes it does.
-For example, compare:
+The difference is the sigil, that special character in front of the
+array name. The C<$> sigil means "exactly one item", while the C<@>
+sigil means "zero or more items". The C<$> gets you a single scalar,
+while the C<@> gets you a list.
 
-	$good[0] = `some program that outputs several lines`;
+The confusion arises because people incorrectly assume that the sigil
+denotes the variable type.
 
-with
+The C<$array[1]> is a single-element access to the array. It's going
+to return the item in index 1 (or undef if there is no item there).
+If you intend to get exactly one element from the array, this is the
+form you should use.
 
-	@bad[0]  = `same program that outputs several lines`;
+The C<@array[1]> is an array slice, although it has only one index.
+You can pull out multiple elements simultaneously by specifying
+additional indices as a list, like C<@array[1,4,3,0]>.
 
-The C<use warnings> pragma and the B<-w> flag will warn you about these
-matters.
+Using a slice on the lefthand side of the assignment supplies list
+context to the righthand side. This can lead to unexpected results.
+For instance, if you want to read a single line from a filehandle,
+assigning to a scalar value is fine:
+
+	$array[1] = <STDIN>;
+
+However, in list context, the line input operator returns all of the
+lines as a list. The first line goes into C<@array[1]> and the rest
+of the lines mysteriously disappear:
+
+	@array[1] = <STDIN>;  # most likely not what you want
+
+Either the C<use warnings> pragma or the B<-w> flag will warn you when
+you use an array slice with a single index.
 
 =head2 How can I remove duplicate elements from a list or array?
 
@@ -2115,9 +2137,9 @@ You can use the C<keys()> built-in function in scalar context to find out
 have many entries you have in a hash:
 
 	my $key_count = keys %hash; # must be scalar context!
-	
+
 If you want to find out how many entries have a defined value, that's
-a bit different. You have to check each value. A C<grep> is handy: 
+a bit different. You have to check each value. A C<grep> is handy:
 
 	my $defined_value_count = grep { defined } values %hash;
 
@@ -2126,7 +2148,7 @@ you like. If you want the count of the keys with vowels in them,
 you just test for that instead:
 
 	my $vowel_count = grep { /[aeiou]/ } keys %hash;
-	
+
 The C<grep> in scalar context returns the count. If you want the list
 of matching items, just use it in list context instead:
 
